@@ -88,3 +88,64 @@ class Player:
                 _save_json(player_data)
             else:
                 print(f"Item {item_name} not found in {' -> '.join(categories)}!")
+    
+    class Skills:
+        def __init__(self):
+            """Initialize predefined skill categories: attacks and abilities."""
+            player_data = _load_json()
+            skills = player_data.setdefault("player", {}).setdefault("skills", {})
+
+            # Ensure predefined categories exist
+            skills.setdefault("attacks", {})
+            skills.setdefault("abilities", {})
+
+            _save_json(player_data)
+
+        def new_category(self, category_name):
+            """Creates a new skill category if it doesn’t exist."""
+            player_data = _load_json()
+            skills = player_data["player"]["skills"]
+
+            if category_name not in skills:
+                skills[category_name] = {}
+
+            _save_json(player_data)
+
+        def add_skill(self, skill_name, skill_data, category):
+            """Adds a skill to a specific category."""
+            player_data = _load_json()
+            skills = player_data["player"]["skills"]
+
+            if category not in skills:
+                print(f"Category '{category}' does not exist. Create it first.")
+                return
+
+            skills[category][skill_name] = skill_data
+            _save_json(player_data)
+
+        def remove_skill(self, skill_name, category):
+            """Removes a skill from a category."""
+            player_data = _load_json()
+            skills = player_data["player"]["skills"]
+
+            if category in skills and skill_name in skills[category]:
+                del skills[category][skill_name]
+                _save_json(player_data)
+            else:
+                print(f"Skill '{skill_name}' not found in category '{category}'.")
+
+# Example usage
+player_skills = Player.Skills()
+
+# Adding a new category
+player_skills.new_category("magic")
+
+# Adding skills
+player_skills.add_skill("fireball", {"damage": 30, "mana": 10}, "magic")
+player_skills.add_skill("lightning bolt", {"damage": 25, "mana": 8}, "magic")
+player_skills.add_skill("slash", {"damage": 15, "stamina": 5}, "attacks")
+player_skills.add_skill("bite", {"damage": 8, "stamina": 3}, "attacks")
+player_skills.add_skill("heal", {"healing": 20, "mana": 15}, "abilities")
+
+# Removing a skill
+player_skills.remove_skill("Fireball", "magic")
