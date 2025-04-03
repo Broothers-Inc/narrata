@@ -1,5 +1,6 @@
 import json
 import os
+from fluxura import *
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 FILE_PATH = os.path.join(BASE_DIR, "assets.json")
@@ -70,82 +71,54 @@ class Player:
             current[item_name] = item_data
             _save_json(player_data)
 
-        def remove_item(self, item_name, *categories):
-            """Removes an item from a specific category."""
-            player_data = _load_json()
-            inventory = player_data.setdefault("player", {}).setdefault("inventory", {})
+        def remove_item(self, name, *categories):
+            """Removes a skill from a specific category path."""
+            category_tree = self.inventory  
+            for cat in categories[:-1]:  # Traverse to the last subcategory
+                if cat not in category_tree:
+                    raise KeyError(f"Category '{cat}' does not exist.")
+                category_tree = category_tree[cat]
 
-            current = inventory
-            for key in categories:
-                if key in current:
-                    current = current[key]
-                else:
-                    print(f"Category {key} not found!")
-                    return
-
-            if item_name in current:
-                del current[item_name]
-                _save_json(player_data)
+            last_category = categories[-1]
+            if last_category in category_tree and name in category_tree[last_category]:
+                del category_tree[last_category][name]
             else:
-                print(f"Item {item_name} not found in {' -> '.join(categories)}!")
+                print(flux(f"{Style.BOLD}ERROR: RPG/Player/Inventory:\033[0m {Color.Fore.LIGHT_RED}'{name}' not found in {Style.ITALIC}{' → '.join(categories)}.", Color.Fore.LIGHT_RED))
     
     class Skills:
         def __init__(self):
-            """Initialize predefined skill categories: attacks and abilities."""
-            player_data = _load_json()
-            skills = player_data.setdefault("player", {}).setdefault("skills", {})
+            self.skills = {  # ✅ Initialize skills dictionary
+                "attacks": {},
+                "abilities": {}
+            }
 
-            # Ensure predefined categories exist
-            skills.setdefault("attacks", {})
-            skills.setdefault("abilities", {})
+        def new_category(self, *categories):
+            """Allows creating nested skill categories."""
+            category_tree = self.skills
+            for cat in categories:
+                if cat not in category_tree:
+                    category_tree[cat] = {}
+                category_tree = category_tree[cat]
 
-            _save_json(player_data)
+        def add_skill(self, name, attributes, *categories):
+            """Adds a skill to a specific category path."""
+            category_tree = self.skills
+            for cat in categories:
+                if cat not in category_tree:
+                    raise KeyError(f"Category '{cat}' does not exist.")
+                category_tree = category_tree[cat]
+            category_tree[name] = attributes
 
-        def new_category(self, category_name):
-            """Creates a new skill category if it doesn’t exist."""
-            player_data = _load_json()
-            skills = player_data["player"]["skills"]
+        def remove_skill(self, name, *categories):
+            """Removes a skill from a specific category path."""
+            category_tree = self.skills
+            for cat in categories[:-1]:  # Traverse to the last subcategory
+                if cat not in category_tree:
+                    raise KeyError(f"Category '{cat}' does not exist.")
+                category_tree = category_tree[cat]
 
-            if category_name not in skills:
-                skills[category_name] = {}
-
-            _save_json(player_data)
-
-        def add_skill(self, skill_name, skill_data, category):
-            """Adds a skill to a specific category."""
-            player_data = _load_json()
-            skills = player_data["player"]["skills"]
-
-            if category not in skills:
-                print(f"Category '{category}' does not exist. Create it first.")
-                return
-
-            skills[category][skill_name] = skill_data
-            _save_json(player_data)
-
-        def remove_skill(self, skill_name, category):
-            """Removes a skill from a category."""
-            player_data = _load_json()
-            skills = player_data["player"]["skills"]
-
-            if category in skills and skill_name in skills[category]:
-                del skills[category][skill_name]
-                _save_json(player_data)
+            last_category = categories[-1]
+            if last_category in category_tree and name in category_tree[last_category]:
+                del category_tree[last_category][name]
             else:
-                print(f"Skill '{skill_name}' not found in category '{category}'.")
-
-# Example usage
-player_skills = Player.Skills()
-
-# Adding a new category
-player_skills.new_category("magic")
-
-# Adding skills
-player_skills.add_skill("fireball", {"damage": 30, "mana": 10}, "magic")
-player_skills.add_skill("lightning bolt", {"damage": 25, "mana": 8}, "magic")
-player_skills.add_skill("slash", {"damage": 15, "stamina": 5}, "attacks")
-player_skills.add_skill("bite", {"damage": 8, "stamina": 3}, "attacks")
-player_skills.add_skill("heal", {"healing": 20, "mana": 15}, "abilities")
-
-# Removing a skill
-player_skills.remove_skill("Fireball", "magic")
+                print(flux(f"{Style.BOLD}ERROR: RPG/Player/Skill:\033[0m {Color.Fore.LIGHT_RED}'{name}' not found in {Style.ITALIC}{' → '.join(categories)}.", Color.Fore.LIGHT_RED))
