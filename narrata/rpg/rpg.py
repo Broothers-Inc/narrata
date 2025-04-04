@@ -58,7 +58,7 @@ class Player:
             """Creates a new category and subcategories."""
             self._get_nested_dict(categories)
 
-        def add_item(self, item_name, item_data, *categories):
+        def create_item(self, item_name, item_data, *categories):
             """Adds an item to a specific category."""
             player_data = self._get_nested_dict(categories)
             inventory = player_data["player"]["inventory"]
@@ -75,8 +75,6 @@ class Player:
             """Removes a skill from a specific category path."""
             category_tree = self.inventory  
             for cat in categories[:-1]:  # Traverse to the last subcategory
-                if cat not in category_tree:
-                    raise KeyError(f"Category '{cat}' does not exist.")
                 category_tree = category_tree[cat]
 
             last_category = categories[-1]
@@ -84,41 +82,3 @@ class Player:
                 del category_tree[last_category][name]
             else:
                 print(flux(f"{Style.BOLD}ERROR: RPG/Player/Inventory:\033[0m {Color.Fore.LIGHT_RED}'{name}' not found in {Style.ITALIC}{' → '.join(categories)}.", Color.Fore.LIGHT_RED))
-    
-    class Skills:
-        def __init__(self):
-            self.skills = {  # ✅ Initialize skills dictionary
-                "attacks": {},
-                "abilities": {}
-            }
-
-        def new_category(self, *categories):
-            """Allows creating nested skill categories."""
-            category_tree = self.skills
-            for cat in categories:
-                if cat not in category_tree:
-                    category_tree[cat] = {}
-                category_tree = category_tree[cat]
-
-        def add_skill(self, name, attributes, *categories):
-            """Adds a skill to a specific category path."""
-            category_tree = self.skills
-            for cat in categories:
-                if cat not in category_tree:
-                    raise KeyError(f"Category '{cat}' does not exist.")
-                category_tree = category_tree[cat]
-            category_tree[name] = attributes
-
-        def remove_skill(self, name, *categories):
-            """Removes a skill from a specific category path."""
-            category_tree = self.skills
-            for cat in categories[:-1]:  # Traverse to the last subcategory
-                if cat not in category_tree:
-                    raise KeyError(f"Category '{cat}' does not exist.")
-                category_tree = category_tree[cat]
-
-            last_category = categories[-1]
-            if last_category in category_tree and name in category_tree[last_category]:
-                del category_tree[last_category][name]
-            else:
-                print(flux(f"{Style.BOLD}ERROR: RPG/Player/Skill:\033[0m {Color.Fore.LIGHT_RED}'{name}' not found in {Style.ITALIC}{' → '.join(categories)}.", Color.Fore.LIGHT_RED))

@@ -10,9 +10,9 @@ categories = [
 
 # Loop through and create categories and subcategories
 for category, subcategories in categories:
-    player_inventory.new_category(category)  # Add top-level category
+    player_inventory.new_category(category)  # create top-level category
     for subcategory in subcategories:
-        player_inventory.new_category(category, subcategory)  # Add subcategory
+        player_inventory.new_category(category, subcategory)  # create subcategory
 
 # Define the items data in a more structured format
 items_data = [
@@ -28,14 +28,14 @@ items_data = [
     ("mace", {"damage": 15, "speed": 4}, "weapons", "melee", "other"),
 ]
 
-# Loop through and add items to respective categories and subcategories
+# Loop through and create items to respective categories and subcategories
 for item_name, attributes, category, subcategory, *extra in items_data:
     if extra:
-        # If there is an extra subcategory, add that to the item
-        player_inventory.add_item(item_name, attributes, category, subcategory, extra[0])
+        # If there is an extra subcategory, create that to the item
+        player_inventory.create_item(item_name, attributes, category, subcategory, extra[0])
     else:
-        # Otherwise, add the item without extra subcategory
-        player_inventory.add_item(item_name, attributes, category, subcategory)
+        # Otherwise, create the item without extra subcategory
+        player_inventory.create_item(item_name, attributes, category, subcategory)
 
 # Removing items
 player_inventory.remove_item("katana", "weapons", "melee", "blades")
